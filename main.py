@@ -6,6 +6,9 @@ from asteroidfield import AsteroidField
 from shot import Shot
 def main():
     pygame.init()
+    pygame.font.init()
+    font = pygame.font.Font(None, 36)
+    score = 0
     clock = pygame.time.Clock()
     dt = 0
 
@@ -32,15 +35,24 @@ def main():
 
         for asteroid in asteroids:
             if asteroid.collision(player):
-                print("Game over!")
-                return
+                if player.lives > 1:
+                    player.lives -= 1
+                    print(f"Live lost! Remaining lives: {player.lives}")
+                    player.position = pygame.Vector2(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
+                else:
+                    print("Game over!")
+                    return
             for bullet in shots:
                 if bullet.collision(asteroid):
                     asteroid.split()
                     bullet.kill()
+                    score += SCORE_INCREMENT
 
         screen.fill('black')
-
+        score_text = font.render(f'Score: {score}', True, (255, 255, 255))
+        lives_text = font.render(f'Lives: {player.lives}', True, (255, 255, 255))
+        screen.blit(score_text, (10,10))
+        screen.blit(lives_text, (1100,10))
         for entity in drawable:
             entity.draw(screen)
 
